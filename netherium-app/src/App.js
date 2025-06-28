@@ -1,9 +1,11 @@
 import { ColorModeContext, useMode } from "./theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
+import "./App.css";
 import Dashboard from "./scenes/dashboard";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
+import LoginForm from "./scenes/loginForm/LoginForm";
 //import Team from "./scenes/team";
 // import Invoices from "./scenes/invoices";
 // import Contacts from "./scenes/contacts";
@@ -18,18 +20,22 @@ import Sidebar from "./scenes/global/Sidebar";
 
 function App() {
   const [theme, colorMode] = useMode();
-
+  const location = useLocation();
+  const isLoginPage = location.pathname === "/";
 
   return(
     <ColorModeContext.Provider value = {colorMode}>
       <ThemeProvider theme = {theme}>
         <CssBaseline/>
         <div className="app">
+          { !isLoginPage &&
           <Sidebar username="Mark" userrol="Administrador"/>
-          <main className="content">
-            <Topbar/>
+          }
+          <main className={isLoginPage ? "content-login" :"content"}>
+            {! isLoginPage && <Topbar/>}
             <Routes>
-              <Route path="/" element  ={<Dashboard/>}/>
+              <Route path="/" element  ={<LoginForm/>}/>
+              <Route path="/dashboard" element  ={<Dashboard/>}/>
               {/*<Route path="/team" element  ={<Team/>}/>*/}
               {/*<Route path="/contacts" element  ={<Contacts/>}/>*/}
               {/* <Route path="/invoices" element  ={<Invoices/>}/> */}
