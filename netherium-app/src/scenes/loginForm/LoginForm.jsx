@@ -80,7 +80,7 @@ const LoginForm = () => {
           color={colors.grey[100]}
         >
           <label>
-            <input type="checkbox" /> Recordarme
+            <input type="checkbox" /> Recuerda nombre de usuario
           </label>
           <a href="#" style={{ color: colors.greenAccent[400] }}>¿Olvidaste la contraseña?</a>
         </Box>
