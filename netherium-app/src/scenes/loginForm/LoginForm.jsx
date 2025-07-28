@@ -1,19 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
 import { Box, Button, Typography, useTheme} from "@mui/material";
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { InputBase } from '@mui/material';
+import { login } from "../../services/authService";
 
 const LoginForm = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [correo, setCorreo] = useState("");
+  const [clave, setClave] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    navigate("/dashboard");
+    const resultado = await login(correo,clave);
+
+    if (resultado.esValido) {
+      console.log("Login exitoso")
+      navigate("/dashboard");
+    } else {
+      console.log("Login fallido\n" + resultado.error)
+    }
   };
 
   return (
@@ -21,10 +31,6 @@ const LoginForm = () => {
     display="flex"
     justifyContent="center"
     alignItems="center"
-    sx={{
-      
-    }}
-    
     >
       <Box 
         component="form"
@@ -56,7 +62,13 @@ const LoginForm = () => {
           borderRadius= "10px"
           height="35px"
         >
-          <InputBase type='text' sx= {{ml : 2, flex: 1}} placeholder="Nombre de usuario" required/>
+          <InputBase 
+          type='text' 
+          sx= {{ml : 2, flex: 1}} 
+          placeholder="Nombre de usuario" 
+          value={correo}
+          onChange={(e) => setCorreo(e.target.value)}
+          required/>
           <Box display="flex" alignItems="center" mr="5px">
             <AccountCircleOutlinedIcon/>
           </Box>
@@ -67,7 +79,13 @@ const LoginForm = () => {
           borderRadius= "10px"
           height="35px"
         >
-          <InputBase type='password' sx= {{ml : 2, flex: 1}} placeholder="Contraseña" required/>
+          <InputBase 
+          type='password' 
+          sx= {{ml : 2, flex: 1}} 
+          placeholder="Contraseña" 
+          value={clave}
+          onChange={(e) => setClave(e.target.value)}
+          required/>
           <Box display="flex" alignItems="center" mr="5px">
             <LockOutlinedIcon/>
           </Box>
