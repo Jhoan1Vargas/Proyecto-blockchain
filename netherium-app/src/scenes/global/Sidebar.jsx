@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState} from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import 'react-pro-sidebar/dist/css/styles.css';
 import { Box, IconButton, Typography, useTheme} from "@mui/material";
@@ -16,7 +16,6 @@ import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import {Divider} from "@mui/material"
-
 
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -93,6 +92,7 @@ const Sidebar = ({ username, userrol}) => {
             {/* USER */}
             {!isCollapsed && (
               <Box mb="25 px">
+                {/*
                 <Box display="flex" justifyContent="center" alignContent="center">
                   <img 
                     alt="profile-user"
@@ -102,6 +102,7 @@ const Sidebar = ({ username, userrol}) => {
                     style={{cursor: "pointer", borderRadius:"50%"}}
                   />
                 </Box>
+                */}
                 <Box textAlign="center"> 
                   <Typography 
                     variant="h3" 

@@ -11,7 +11,6 @@ import LineChart from "../../components/LineChart";
 import GeographyChart from "../../components/GeographyChart";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
-import ProgressCircle from "../../components/ProgressCircle";
 
 const Dashboard = () => {
 const theme = useTheme();
@@ -21,25 +20,24 @@ return (
 <Box m="20px">
     {/* HEADER */}
     <Box display="flex" justifyContent="space-between" alignItems="center">
-    <Header title="DASHBOARD" subtitle="Bienvenido al Dashboard" />
+        <Header title="DASHBOARD" subtitle="Bienvenido al Dashboard" />
 
-    {/* <Box>
-        <Button
-        sx={{
-            backgroundColor: colors.blueAccent[700],
-            color: colors.grey[100],
-            fontSize: "14px",
-            fontWeight: "bold",
-            padding: "10px 20px",
-        }}
-        >
-        <DownloadOutlinedIcon sx={{ mr: "10px" }} />
-        Download Reports
-        </Button>
-    </Box> */}
-</Box>
-
-    {/* GRID & CHARTS */}
+        <Box>
+            <Button
+            sx={{
+                backgroundColor: colors.blueAccent[700],
+                color: colors.grey[100],
+                fontSize: "14px",
+                fontWeight: "bold",
+                padding: "10px 20px",
+            }}
+            >
+            <DownloadOutlinedIcon sx={{ mr: "10px" }} />
+            Descargar Reportes
+            </Button>
+        </Box> 
+    </Box>
+    {/* GRAFICOS */}
     <Box
     display="grid"
     gridTemplateColumns="repeat(12, 1fr)"
