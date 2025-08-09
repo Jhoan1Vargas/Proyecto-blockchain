@@ -1,4 +1,4 @@
-import { useState} from "react";
+import { useState, useContext } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import 'react-pro-sidebar/dist/css/styles.css';
 import { Box, IconButton, Typography, useTheme} from "@mui/material";
@@ -6,16 +6,18 @@ import { Link } from "react-router-dom";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
-import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined';
 import ReceiptOutlinedIcon from '@mui/icons-material/ReceiptOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import PieChartOutlineOutlinedIcon from '@mui/icons-material/PieChartOutlineOutlined';
 import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
-import {Divider} from "@mui/material"
+import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import PaidOutlinedIcon from '@mui/icons-material/PaidOutlined';
+import { Divider } from "@mui/material"
+import { GlobalContext } from "../../components/GlobalContext"
+import { NombrarRol } from "../../data/constantes"
 
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -36,11 +38,13 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   );
 };
 
-const Sidebar = ({ username, userrol}) => {
+const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+  const { usuarioActual } = useContext(GlobalContext);
+
 
   return (
     <Box
@@ -108,11 +112,11 @@ const Sidebar = ({ username, userrol}) => {
                     variant="h3" 
                     color={colors.grey[100]} 
                     fontWeight="bold" 
-                    sx={{ m: "10px 0 0 0" }}>{username}</Typography>
+                    sx={{ m: "10px 0 0 0" }}>{usuarioActual.Nombre}</Typography>
                   <Typography 
                     variant="h6" 
                     color={colors.greenAccent[500]}
-                  >{userrol}</Typography>
+                  >{NombrarRol(usuarioActual.idRol)}</Typography>
                 </Box>
               </Box>
             )}
@@ -133,9 +137,9 @@ const Sidebar = ({ username, userrol}) => {
                 variant="h6"
                 color={colors.grey[200]}
 
-                sx= {isCollapsed ? {m:"15px 0 5px 22px"} : {m:"15px 0 5px 20px"}}
+                sx= {isCollapsed ? {m:"15px 0 5px 10px"} : {m:"15px 0 5px 20px"}}
               >
-                Data
+                Registros
               </Typography>
 
               <Item
@@ -146,52 +150,54 @@ const Sidebar = ({ username, userrol}) => {
               setSelected={setSelected}
             />
 
+              {/* <Item
+              title="Mi Perfil"
+              to="/form"
+              icon={<PersonOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            /> */}
+
               <Item
-              title="Contactos"
-              to="/contacts"
-              icon={<ContactsOutlinedIcon />}
+              title="Wallet"
+              to="/wallet"
+              icon={<AccountBalanceWalletOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
+
+            <Typography
+              variant="h6"
+              color={colors.grey[200]}
+              sx= {isCollapsed ? {m:"15px 0 5px 15px"} : {m:"15px 0 5px 20px"}}
+            >
+              Procesos
+            </Typography>
+
             <Item
-              title="Balances"
+              title="Transacciones"
+              to="/faq"
+              icon={<PaidOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+
+            <Typography
+              variant="h6"
+              color={colors.grey[200]}
+              sx= {isCollapsed ? {m:"15px 0 5px 15px"} : {m:"15px 0 5px 20px"}}
+            >
+              Reportes
+            </Typography>
+            
+            <Item
+              title="Recibos"
               to="/invoices"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
 
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx= {isCollapsed ? {m:"15px 0 5px 15px"} : {m:"15px 0 5px 20px"}}
-            >
-              Páginas
-            </Typography>
-
-            <Item
-              title="Usuario"
-              to="/form"
-              icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-
-            <Item
-              title="FAQ"
-              to="/faq"
-              icon={<HelpOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx= {isCollapsed ? {m:"15px 0 5px 15px"} : {m:"15px 0 5px 20px"}}
-            >
-              Gráficos
-            </Typography>
             <Item
               title="Gráfico de Barras"
               to="/bar"

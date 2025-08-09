@@ -3,15 +3,15 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
-import { SearchProvider } from "../src/components/SearchContext";
+import { GlobalProvider } from "../src/components/GlobalContext"
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <SearchProvider>
+      <GlobalProvider>
         <App />
-      </SearchProvider>
+      </GlobalProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

@@ -1,6 +1,7 @@
 const { 
+  loginUsuario,
   buscarUsuarioPorId,
-  buscarUsuarioPorNombreYClave, 
+  buscarUsuarioPorNombre, 
   buscarUsuarios,
   insertarUsuario,
   actualizarUsuario,
@@ -14,7 +15,7 @@ async function login(req, res) {
   const { nombre, clave } = req.body;
 
   try {
-    const usuario = await buscarUsuarioPorNombreYClave(nombre, clave);
+    const usuario = await loginUsuario(nombre, clave);
 
     if (!usuario) {
       return res.status(401).json({ mensaje: "Credenciales inválidas", esValido: false });

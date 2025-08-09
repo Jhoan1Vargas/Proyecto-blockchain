@@ -13,13 +13,13 @@ import { obtenerUsuarios, agregarUsuario, modificarUsuario} from "../../services
 import { Roles, NombrarRol, OrigenUsuario } from "../../data/constantes"
 import  ModalUsuario  from "../../components/ModalUsuario"
 import  ModalMensaje  from "../../components/ModalMensaje"
-import { SearchContext } from "../../components/SearchContext"
+import { GlobalContext } from "../../components/GlobalContext"
+
 
 
 const Team = (abrirForm) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { textoBusqueda } = useContext(SearchContext);
 
   const [abrirModal, setAbrirModal] = useState(false);
   const [abrirModalMensaje, setAbrirModalMensaje] = useState(false);
@@ -29,6 +29,7 @@ const Team = (abrirForm) => {
   const [origen, setOrigen] = useState(0);
 
   const [usuarios, setUsuarios] = useState([]);
+  const { textoBusqueda } = useContext(GlobalContext);
 
   const usuariosFiltrados = usuarios.filter((usuario) =>
     usuario.Id.toString().includes(textoBusqueda.toLowerCase()) ||
@@ -40,19 +41,60 @@ const Team = (abrirForm) => {
     { field: "Id", 
       headerName: "ID",
       headerClassName: "custom-header",
+      cellClassName: "objeto-centrado--cell",
+      renderCell: ({row}) => {
+        return(
+          <Box
+            display="flex"
+            justifyContent="left"
+            alignItems="center"
+            width="100%"
+            gap="10%"
+          >
+          <Typography>{row.Id}</Typography>
+          </Box>
+        );
+      }
     },
     {
       field: "Nombre",
       headerName: "Usuario",
       flex: 1,
-      cellClassName: "name-column--cell",
+      cellClassName: "objeto-centrado--cell",
       headerClassName: "custom-header",
+      renderCell: ({row}) => {
+        return(
+          <Box
+            display="flex"
+            justifyContent="left"
+            alignItems="center"
+            width="100%"
+            gap="10%"
+          >
+          <Typography>{row.Nombre}</Typography>
+          </Box>
+        );
+      }
     },
     {
       field: "Correo",
       headerName: "Correo",
       flex: 1,
+      cellClassName: "objeto-centrado--cell",
       headerClassName: "custom-header",
+      renderCell: ({row}) => {
+        return(
+          <Box
+            display="flex"
+            justifyContent="left"
+            alignItems="center"
+            width="100%"
+            gap="10%"
+          >
+          <Typography>{row.Correo}</Typography>
+          </Box>
+        );
+      }
     },
     {
       field: "IdRol",
@@ -310,7 +352,7 @@ const Team = (abrirForm) => {
         mensaje={contenidoMensaje}
       />
       <Box
-        m="40px 0 0 0"
+        m="20px 0 0 0"
         height="75vh"
         sx={{
           "& .MuiDataGrid-root": {
@@ -339,6 +381,7 @@ const Team = (abrirForm) => {
             color: colors.grey[100],
             border: "none",
             fontSize: "16px",
+            fontWeight:"bold",
           },
         }}
       >
@@ -347,6 +390,7 @@ const Team = (abrirForm) => {
         columns={columnas} 
         getRowId={(row) => row.Id}
         isRowSelectable={() => false}
+        disableColumnResize
         />
       </Box>
     </Box>

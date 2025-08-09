@@ -1,18 +1,28 @@
+const { hashClave, verificarClave } = require("../utils/seguridad");
 const { poolPromise } = require("../db/db");
 
-async function buscarUsuarioPorNombreYClave(nombre, clave) {
+async function buscarUsuarioPorNombre(nombre) {
   const pool = await poolPromise;
   const result = await pool
     .request()
     .input("nombre", nombre)
-    .input("clave", clave)
     .query(`
       SELECT Id, idRol, Nombre, Contrasena, Correo, FechaCreacion, Estado
       FROM Usuario
-      WHERE Nombre = @nombre AND Contrasena = @clave AND Estado = 'A'
+      WHERE Nombre = @nombre AND Estado = 'A'
     `);
 
-  return result.recordset[0]; // devuelve usuario o undefined
+  return result.recordset[0] || null; // devuelve usuario o undefined
+}
+
+async function loginUsuario(nombre, clave) {
+  const usuario = await buscarUsuarioPorNombre(nombre);
+  if (!usuario) return null;
+
+  const match = await verificarClave(clave, usuario.Contrasena);
+  if (!match) return null;
+
+  return usuario;
 }
 
 async function buscarUsuarioPorId(id) {
@@ -26,7 +36,7 @@ async function buscarUsuarioPorId(id) {
       WHERE Id = @Id
     `);
 
-  return result.recordset[0]; // devuelve usuario o undefined
+  return result.recordset[0] || []; // devuelve usuario o undefined
 }
 
 async function buscarUsuarios() {
@@ -43,10 +53,12 @@ async function buscarUsuarios() {
 
 async function insertarUsuario(nombre, clave, correo, idrol, estado) {
   const pool = await poolPromise;
+  const hashedClave = await hashClave(clave);
+
   const result = await pool
     .request()
     .input("nombre", nombre)
-    .input("clave", clave)
+    .input("clave", hashedClave)
     .input("correo", correo)
     .input("idrol", idrol)
     .input("estado", estado)
@@ -55,17 +67,19 @@ async function insertarUsuario(nombre, clave, correo, idrol, estado) {
       VALUES(@nombre, @clave, @correo, @idrol, @estado)
     `);
 
-  return result.recordset; // devuelve usuarios o undefined
+  return result.rowsAffected[0]; // devuelve usuarios o undefined
 }
 
 
 async function actualizarUsuario(id, nombre, clave, correo, idrol, estado) {
   const pool = await poolPromise;
+  const hashedClave = await hashClave(clave);
+
   const result = await pool
     .request()
     .input("id", id)
     .input("nombre", nombre)
-    .input("clave", clave)
+    .input("clave", hashedClave)
     .input("correo", correo)
     .input("idrol", idrol)
     .input("estado", estado)
@@ -84,8 +98,9 @@ async function actualizarUsuario(id, nombre, clave, correo, idrol, estado) {
 
 
 module.exports = { 
+  loginUsuario,
   buscarUsuarioPorId,
-  buscarUsuarioPorNombreYClave,
+  buscarUsuarioPorNombre,
   buscarUsuarios,
   insertarUsuario,
   actualizarUsuario

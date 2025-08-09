@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { crearWallet } = require("../controllers/walletController");
+const { 
+  crearWallet,
+  buscarWalletsUsuario
+} = require("../controllers/walletController");
 
-router.post("/crear", crearWallet);
+router.post("/:id/crear", crearWallet);
+router.get("/:id", buscarWalletsUsuario);
 
 module.exports = router;

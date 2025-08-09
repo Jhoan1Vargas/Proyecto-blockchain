@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
 import { 
@@ -8,10 +8,11 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { InputBase } from '@mui/material';
 import { login, agregarUsuario } from "../../services/authService";
-import { NombrarRol, OrigenUsuario } from "../../data/constantes"
+import { OrigenUsuario } from "../../data/constantes"
 import ModalUsuario from "../../components/ModalUsuario"
+import { GlobalContext } from "../../components/GlobalContext"
 
-const LoginForm = ({ setIdUser, setUsername, setUserrol }) => {
+const LoginForm = ({ setUser }) => {
   const navigate = useNavigate();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -22,15 +23,14 @@ const LoginForm = ({ setIdUser, setUsername, setUserrol }) => {
   const [abrirModalUsuario, setAbrirModalUsuario] = useState(false);
   const [mensajeError, setMensajeError] = useState("");
 
+  const { setUsuarioActual } = useContext(GlobalContext);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     const resultado = await login(correo,clave);
 
     if (resultado.esValido) {
-      console.log("Login exitoso");
-      setIdUser(resultado.data.usuario.id);
-      setUsername(resultado.data.usuario.Nombre);
-      setUserrol(NombrarRol(resultado.data.usuario.idRol));
+      setUsuarioActual(resultado.data.usuario);
       navigate("/dashboard");
     } else {
       console.log("Login fallido\n" + resultado.error);
@@ -56,12 +56,7 @@ const LoginForm = ({ setIdUser, setUsername, setUserrol }) => {
   
       try 
       {
-        const data = await agregarUsuario(usuario);
-        if(data.esValido) {
-          // setTituloMensaje("Agregar Usuario Nuevo");
-          // setContenidoMensaje(data.data.mensaje);
-          // setAbrirModalMensaje(true)
-        }
+        await agregarUsuario(usuario);
       } catch (error) {
         console.error("Error agregando usuario nuevo:", error);
       }

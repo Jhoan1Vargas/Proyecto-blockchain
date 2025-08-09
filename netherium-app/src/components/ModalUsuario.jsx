@@ -69,7 +69,7 @@ const ModalUsuario = ({ abrir, cerrarModal, onSubmit, usuarioEditar, origen }) =
       setControles({
         userNameVisible: true,
         userNameHabilitado: true,
-        claveVisible: true,
+        claveVisible: false,
         claveHabilitado: false,
         correoVisible: true,
         correoHabilitado: true,
@@ -116,7 +116,7 @@ const ModalUsuario = ({ abrir, cerrarModal, onSubmit, usuarioEditar, origen }) =
     }
   };
 
-  const cargarDatosUsuario = () => {
+  const cargarDatosUsuario = (usuarioEditar) => {
     if (usuarioEditar.id > 0) {
       setInitialValues({
         idUser: usuarioEditar.id,
@@ -134,9 +134,9 @@ const ModalUsuario = ({ abrir, cerrarModal, onSubmit, usuarioEditar, origen }) =
       cargarRoles();
       setShowclave(false);
       ajustarControles(origen)
-      if (usuarioEditar.id > 0) cargarDatosUsuario();
+      if (usuarioEditar.id > 0) cargarDatosUsuario(usuarioEditar);
     }
-  }, [abrir, origen]);
+  }, [abrir, origen, usuarioEditar]);
 
   return(
     <Dialog
@@ -194,7 +194,7 @@ const ModalUsuario = ({ abrir, cerrarModal, onSubmit, usuarioEditar, origen }) =
                   error={!!touched.userName && !!errors.userName}
                   helperText={touched.userName && errors.userName}
                   sx={{ 
-                    gridColumn: "span 2",
+                    gridColumn: controles.claveVisible ? "span 2" : "span 4",
                     '& .MuiFilledInput-root': {
                       color: colors.grey[100],
                       '&:after': {
@@ -214,6 +214,7 @@ const ModalUsuario = ({ abrir, cerrarModal, onSubmit, usuarioEditar, origen }) =
                       color: colors.grey[300] ,
                     },
                     "& .MuiFormHelperText-root": {
+                      font:"bold",
                       color: touched.userName && errors.userName
                         ? colors.blueAccent[300]  // Si hay error
                         : colors.grey[300],      // Si no hay error
@@ -254,6 +255,7 @@ const ModalUsuario = ({ abrir, cerrarModal, onSubmit, usuarioEditar, origen }) =
                       color: colors.grey[300] ,
                     },
                     "& .MuiFormHelperText-root": {
+                      font: "bold",
                       color: touched.clave && errors.clave
                         ? colors.blueAccent[300]  
                         : colors.grey[300],      
