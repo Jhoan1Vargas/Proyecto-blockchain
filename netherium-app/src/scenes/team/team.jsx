@@ -352,7 +352,7 @@ const Team = (abrirForm) => {
         mensaje={contenidoMensaje}
       />
       <Box
-        m="20px 0 0 0"
+        m="21px 0 0 0"
         height="75vh"
         sx={{
           "& .MuiDataGrid-root": {

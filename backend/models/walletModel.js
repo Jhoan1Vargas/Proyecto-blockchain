@@ -22,8 +22,8 @@ async function guardarWalletIdUsuario({idUsuario, direccion, llavePrivada, mnemo
     .input("id", id)
     .input("idusuario", idUsuario)
     .input("direccion", direccion)
-    .input("llaveprivada", encriptar(llavePrivada))
-    .input("mnemonic", encriptar(mnemonic))
+    .input("llaveprivada", llavePrivada)
+    .input("mnemonic", mnemonic)
     .input("balance", balance)
     .query(`
       INSERT INTO Wallet(Id,IdUsuario, Direccion, LlavePrivada, Mnemonic, Balance)
@@ -44,7 +44,39 @@ async function buscarMaxIdWalletPorIdUsuario(idUsuario) {
 }
 
 
+async function buscarIdWalletPorId(id, idUsuario) {
+  const pool = await poolPromise;
+  const result = await pool
+    .request()
+    .input("id", id)
+    .input("idusuario", idUsuario)
+    .query(`
+      SELECT Id, IdUsuario, Direccion, LlavePrivada, Mnemonic, Balance
+      FROM Wallet
+      WHERE Id = @id AND IdUsuario = @idusuario
+    `);
+
+  return result.recordset.length === 0 ? null : result.recordset[0];
+}
+
+async function actualizarBalanceWallet(id, idUsuario, monto) {
+  const pool = await poolPromise;
+  const result = await pool
+    .request()
+    .input("monto", monto)
+    .input("id", id)
+    .input("idusuario", idUsuario)
+    .query(`
+      UPDATE Wallet SET Balance = Balance + @monto, FechaActualizacion = GETDATE() WHERE Id = @id AND idUsuario = @idusuario
+    `);
+
+  return result.rowsAffected[0] > 0; 
+}
+
+
 module.exports = {
   buscarWalletPorIdUsuario,
   guardarWalletIdUsuario,
+  buscarIdWalletPorId,
+  actualizarBalanceWallet,
 }

@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node index.js"
+    "dev":"node index.js",
+    "start-setup": "node scripts/importarCuentas.js",
+    "start-hardhat": "npx hardhat node",
+    "init": "npm run start-setup && npm run dev"
   },
   "keywords": [],
   "author": "",

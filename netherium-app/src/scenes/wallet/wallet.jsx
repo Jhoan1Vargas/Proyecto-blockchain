@@ -118,7 +118,7 @@ const Wallet = (abrirForm) => {
             width="100%"
             gap="10%"
           >
-          <Typography>{`NTH ${balanceFormateado}`}</Typography>
+          <Typography>{`ETH ${balanceFormateado}`}</Typography>
           </Box>
         );
       }

@@ -1,19 +1,24 @@
-const { Wallet } = require("ethers");
+const { Wallet, JsonRpcProvider } = require("ethers");
 const { 
   buscarWalletPorIdUsuario,
   guardarWalletIdUsuario,
 } = require("../models/walletModel");
 
+const provider = new JsonRpcProvider("http://127.0.0.1:8545");
+
 const crearWallet = async (req, res) => {
   const idUsuario = req.params.id;
   try {
-    const walletHardHat = Wallet.createRandom();
+
+    const walletHardHat = Wallet.createRandom().connect(provider);
+    const balance = await provider.getBalance(walletHardHat.address);
+
     const wallet = {
       idUsuario:    idUsuario, 
       direccion:    walletHardHat.address, 
       llavePrivada: walletHardHat.privateKey, 
       mnemonic:     walletHardHat.mnemonic.phrase, 
-      balance:      0
+      balance:      balance.toString(),
     }
 
     const filas = await guardarWalletIdUsuario(wallet);

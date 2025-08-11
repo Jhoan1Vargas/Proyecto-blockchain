@@ -214,7 +214,6 @@ const ModalUsuario = ({ abrir, cerrarModal, onSubmit, usuarioEditar, origen }) =
                       color: colors.grey[300] ,
                     },
                     "& .MuiFormHelperText-root": {
-                      font:"bold",
                       color: touched.userName && errors.userName
                         ? colors.blueAccent[300]  // Si hay error
                         : colors.grey[300],      // Si no hay error
@@ -255,7 +254,6 @@ const ModalUsuario = ({ abrir, cerrarModal, onSubmit, usuarioEditar, origen }) =
                       color: colors.grey[300] ,
                     },
                     "& .MuiFormHelperText-root": {
-                      font: "bold",
                       color: touched.clave && errors.clave
                         ? colors.blueAccent[300]  
                         : colors.grey[300],      
@@ -442,6 +440,16 @@ const ModalUsuario = ({ abrir, cerrarModal, onSubmit, usuarioEditar, origen }) =
 
               </Box>
               <Box display="flex" justifyContent="flex-end" width="100%" mt="20px" gap="10px">
+                <Button type="submit" variant="contained"
+                  sx={{
+                    minWidth: "25%",
+                    backgroundColor: colors.greenAccent[700],
+                    color: colors.grey[100],
+                    ":hover":{backgroundColor:colors.greenAccent[800]}
+                  }}
+                >
+                  Guardar
+                </Button>
                 <Button type="button" variant="contained" 
                   sx={{
                     minWidth: "25%",
@@ -452,16 +460,6 @@ const ModalUsuario = ({ abrir, cerrarModal, onSubmit, usuarioEditar, origen }) =
                   onClick={cerrarModal}
                 >
                   Salir
-                </Button>
-                <Button type="submit" variant="contained"
-                  sx={{
-                    minWidth: "25%",
-                    backgroundColor: colors.greenAccent[700],
-                    color: colors.grey[100],
-                    ":hover":{backgroundColor:colors.greenAccent[800]}
-                  }}
-                >
-                  Guardar
                 </Button>
               </Box>
             </form>
