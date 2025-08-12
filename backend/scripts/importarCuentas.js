@@ -37,7 +37,7 @@ async function main() {
   await crearUsuarioBanco()
 
   for (let i = 0; i < cuentasPrivadas.length; i++) {
-    const llavePrivada = cuentasPrivadas[i];
+    let llavePrivada = cuentasPrivadas[i];
 
     const wallet = new ethers.Wallet(llavePrivada, provider);
     const direccion = wallet.address;
@@ -45,6 +45,7 @@ async function main() {
     const balanceWei = await provider.getBalance(direccion);
     const balance = ethers.formatEther(balanceWei);
     
+    llavePrivada = llavePrivada.toString().slice(2);
     
     const seRegistro = await guardarWalletIdUsuario({idUsuario, direccion, llavePrivada, mnemonic, balance });
     if (seRegistro) console.log(`Se agrego la wallet (${direccion}) correctamente en la BD`);

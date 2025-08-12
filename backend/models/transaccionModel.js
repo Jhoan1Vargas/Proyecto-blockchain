@@ -14,7 +14,7 @@ async function guardarTransaccion(transaccion) {
   `;
 
   try {
-    const pool = await sql.connect();
+    const pool = await poolPromise;
     const result = await pool.request()
       .input("HashTx",                transaccion.HashTx)
       .input("IdWalletOrigen",        transaccion.IdWalletOrigen)
@@ -30,9 +30,6 @@ async function guardarTransaccion(transaccion) {
       .input("Red",                   transaccion.Red)
       .query(query);
 
-    await actualizarBalanceWallet(transaccion.IdUsuarioOrigen, transaccion.IdWalletOrigen, (-1 * transaccion.Monto));
-    await actualizarBalanceWallet(transaccion.IdUsuarioDestino, transaccion.IdWalletDestino, transaccion.Monto);
-
     return result.recordset[0].id;
   } catch (error) {
     console.error("Error guardarTransaccion:", error);
@@ -40,6 +37,39 @@ async function guardarTransaccion(transaccion) {
   }
 }
 
+async function actualizarEstadoTransaccion(id,transaccion) {
+  const query = `
+    UPDATE Transaccion SET 
+    HashTx = @HashTx,
+    BalanceOrigenDespues = @BalanceOrigenDespues,
+    BalanceDestinoDespues = @BalanceDestinoDespues,
+    Estado = @Estado
+    WHERE Id = @Id AND Estado = 'P'
+  `;
+
+  try {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input("HashTx",                transaccion.HashTx)
+      .input("BalanceOrigenDespues",  transaccion.BalanceOrigenDespues)
+      .input("BalanceDestinoDespues", transaccion.BalanceDestinoDespues)
+      .input("Estado",                transaccion.Estado)
+      .input("Id",                    id)
+      .query(query);
+
+    if (transaccion.estado === 'A') {
+      await actualizarBalanceWallet(transaccion.IdUsuarioOrigen, transaccion.IdWalletOrigen, (-1 * transaccion.Monto));
+      await actualizarBalanceWallet(transaccion.IdUsuarioDestino, transaccion.IdWalletDestino, transaccion.Monto);
+    }
+
+    return result.rowsAffected[0] > 0;
+  } catch (error) {
+    console.error("Error actualizarEstadoTransaccion:", error);
+    throw error;
+  }
+}
+
 module.exports = {
-  guardarTransaccion
+  guardarTransaccion,
+  actualizarEstadoTransaccion,
 }

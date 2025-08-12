@@ -1,5 +1,5 @@
 const { ethers } = require("ethers");
-const { guardarTransaccion } = require("../models/transaccionModel");
+const { guardarTransaccion, actualizarEstadoTransaccion } = require("../models/transaccionModel");
 const { buscarIdWalletPorId } = require("../models/walletModel");
 
 const realizarTransaccion = async (req, res) => {
@@ -22,42 +22,60 @@ const realizarTransaccion = async (req, res) => {
     }
 
     const llaveprivada = walletOrigen.LlavePrivada.toString();
-    console.log(typeof(llaveprivada) === "string" && !llaveprivada.startsWith("0x"))
-
     const walletFirmante = new ethers.Wallet(llaveprivada, provider);
 
     // Consultar balances antes
-    const balanceOrigenAntes = await provider.getBalance(walletOrigen.direccion);
-    const balanceDestinoAntes = await provider.getBalance(walletDestino.direccion);
+    const balanceWeiOrigenAntes = await provider.getBalance(walletOrigen.Direccion);
+    const balanceOrigenAntes = ethers.formatEther(balanceWeiOrigenAntes);
 
+    const balanceWeiDestinoAntes = await provider.getBalance(walletDestino.Direccion);
+    const balanceDestinoAntes = ethers.formatEther(balanceWeiDestinoAntes);
 
     // Preparar la transacción
     const txResponse = await walletFirmante.sendTransaction({
-      to: walletDestino.direccion,
-      value: parseEther(monto.toString()),
+      to: walletDestino.Direccion,
+      value: ethers.parseEther(monto.toString()),
     });
 
-    // Esperar confirmación
-    const txReceipt = await txResponse.wait();
-
-    // Consultar balances después
-    const balanceOrigenDespues = await provider.getBalance(walletOrigen.direccion);
-    const balanceDestinoDespues = await provider.getBalance(walletDestino.direccion);
-
-    // Guardar en BD
+    // Guardar en BD en Espera de Respuesta
     const idTx = await guardarTransaccion({
-      HashTx:                 txReceipt.transactionHash,
+      HashTx:                 null,
       IdWalletOrigen:         idWalletOrigen,
       IdUsuarioOrigen:        idUsuarioOrigen,
       IdWalletDestino:        idWalletDestino,
       IdUsuarioDestino:       idUsuarioDestino,
       Monto:                  monto,
       BalanceOrigenAntes:     balanceOrigenAntes.toString(),
-      BalanceOrigenDespues:   balanceOrigenDespues.toString(),
+      BalanceOrigenDespues:   null,
       BalanceDestinoAntes:    balanceDestinoAntes.toString(),
-      BalanceDestinoDespues:  balanceDestinoDespues.toString(),
-      Estado:                 "A",
+      BalanceDestinoDespues:  null,
+      Estado:                 "P",
       Red:                    "Hardhat",
+    });
+
+
+    // Esperar confirmación
+    const txReceipt = await txResponse.wait();
+
+    //Asegurar que la red refleje los cambios
+    await provider.waitForTransaction(txResponse.hash);
+
+    // Consultar balances después
+    const balanceWeiOrigenDespues = await provider.getBalance(walletOrigen.Direccion);
+    const balanceOrigenDespues = ethers.formatEther(balanceWeiOrigenDespues);
+
+    const balanceWeiDestinoDespues = await provider.getBalance(walletDestino.Direccion);
+    const balanceDestinoDespues = ethers.formatEther(balanceWeiDestinoDespues);
+
+
+    await actualizarEstadoTransaccion(
+      idTx,
+      {
+      HashTx:                 txReceipt.transactionHash,
+      Monto:                  monto,
+      BalanceOrigenDespues:   balanceOrigenDespues.toString(),
+      BalanceDestinoDespues:  balanceDestinoDespues.toString(),
+      Estado:                 txReceipt.status === 1 ? "A": "R",
     });
 
     res.status(201).json({ mensaje: "Transacción realizada con éxito", esValido: true, idTx, hashTx: txReceipt.transactionHash });

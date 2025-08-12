@@ -12,11 +12,12 @@ const crearWallet = async (req, res) => {
 
     const walletHardHat = Wallet.createRandom().connect(provider);
     const balance = await provider.getBalance(walletHardHat.address);
+    const llavePrivada = walletHardHat.privateKey;
 
     const wallet = {
       idUsuario:    idUsuario, 
       direccion:    walletHardHat.address, 
-      llavePrivada: walletHardHat.privateKey, 
+      llavePrivada: llavePrivada.toString().slice(2), 
       mnemonic:     walletHardHat.mnemonic.phrase, 
       balance:      balance.toString(),
     }
