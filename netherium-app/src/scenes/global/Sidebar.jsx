@@ -7,7 +7,6 @@ import { tokens } from "../../theme";
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import ReceiptOutlinedIcon from '@mui/icons-material/ReceiptOutlined';
-import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import PieChartOutlineOutlinedIcon from '@mui/icons-material/PieChartOutlineOutlined';
 import TimelineOutlinedIcon from '@mui/icons-material/TimelineOutlined';
@@ -112,11 +111,11 @@ const Sidebar = () => {
                     variant="h3" 
                     color={colors.grey[100]} 
                     fontWeight="bold" 
-                    sx={{ m: "10px 0 0 0" }}>{usuarioActual.Nombre}</Typography>
+                    sx={{ m: "10px 0 0 0" }}>{!!!usuarioActual ?  "": usuarioActual.Nombre }</Typography>
                   <Typography 
                     variant="h6" 
                     color={colors.greenAccent[500]}
-                  >{NombrarRol(usuarioActual.idRol)}</Typography>
+                  >{NombrarRol(!!!usuarioActual ? "" : usuarioActual.idRol)}</Typography>
                 </Box>
               </Box>
             )}
@@ -176,7 +175,7 @@ const Sidebar = () => {
 
             <Item
               title="Transacciones"
-              to="/faq"
+              to="/compra"
               icon={<PaidOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

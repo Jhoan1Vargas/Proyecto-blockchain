@@ -1,4 +1,4 @@
-import { Box, ButtonBase, Typography, TextField, useTheme } from "@mui/material";
+import { Box, ButtonBase, Typography, TextField, useTheme, Snackbar } from "@mui/material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import "dayjs/locale/es"; 
@@ -31,11 +31,12 @@ const Wallet = (abrirForm) => {
   const [fechaMin, setFechaMin] = useState(null);
   const [fechaMax, setFechaMax] = useState(null);
 
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const [wallets, setWallets] = useState([]);
   const { usuarioActual, textoBusqueda } = useContext(GlobalContext);
 
-  const walletsFiltrados = wallets.filter((wallet) =>{
+  const walletsFiltrados = !!!wallets? [] : wallets.filter((wallet) =>{
     
     const cumpleTexto = wallet.Id.toString().includes(textoBusqueda.toLowerCase()) ;
     const cumpleBalanceMin = balanceMin === "" || Number(wallet.Balance) >= Number(balanceMin);
@@ -46,6 +47,11 @@ const Wallet = (abrirForm) => {
 
     return cumpleTexto && cumpleBalanceMin && cumpleBalanceMax && cumpleFechaMin && cumpleFechaMax;
   });
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setOpenSnackbar(false);
+  };
 
   const columnas = [
     { field: "Id", 
@@ -79,7 +85,7 @@ const Wallet = (abrirForm) => {
         
         const handleCopiar = () => {
           navigator.clipboard.writeText(row.Direccion);
-          alert("Dirección copiada!");
+          setOpenSnackbar(true);
         };
 
         return(
@@ -118,7 +124,7 @@ const Wallet = (abrirForm) => {
             width="100%"
             gap="10%"
           >
-          <Typography>{`ETH ${balanceFormateado}`}</Typography>
+          <Typography>{`${balanceFormateado} ETH`}</Typography>
           </Box>
         );
       }
@@ -153,8 +159,7 @@ const Wallet = (abrirForm) => {
 
   const CargarWallets = async () => {
     try {
-        const data = await obtenerWallets(usuarioActual);
-        console.log(data.wallets);
+        const data = await obtenerWallets(!!!usuarioActual ? {Id: 0} : usuarioActual);
         setWallets(data.wallets);
       } catch (error) {
         console.error("Error cargando wallets:", error);
@@ -185,7 +190,7 @@ const Wallet = (abrirForm) => {
       setAbrirModalMensaje(true);
     } catch (error) {
 
-      setTituloMensaje("Error inesperada");
+      setTituloMensaje("Error inesperado");
       setContenidoMensaje(error ? "Error inesperado al Agregar Wallet" : error);
       setAbrirModalMensaje(true)
 
@@ -434,6 +439,13 @@ const Wallet = (abrirForm) => {
         disableColumnResize
         />
       </Box>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={1000} 
+        onClose={handleCloseSnackbar}
+        message="Dirección de Wallet copiada"
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} 
+      />
     </Box>
   );
 };

@@ -1,11 +1,12 @@
 import { 
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, useTheme,
+  CircularProgress, Box
 } 
 from "@mui/material";
 import { tokens } from "../theme";
 
 
-const ModalMensaje = ({ abrir, cerrarModal, titulo, mensaje }) => {
+const ModalMensaje = ({ abrir, cerrarModal, titulo, mensaje, enEspera }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -28,16 +29,24 @@ const ModalMensaje = ({ abrir, cerrarModal, titulo, mensaje }) => {
         backgroundColor: colors.grey[800],
         color: colors.grey[100],
         fontWeight: "bold",
-        fontSize: "26px"
+        fontSize: "26px",
+        gap: "10px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-start"
       }}>
+        {enEspera  && <CircularProgress sx={{color: colors.grey[100]}} size={26}/>}
         {titulo}
       </DialogTitle>
+      {mensaje && 
       <DialogContent sx={{backgroundColor: colors.grey[800]}}>
         <DialogContentText id="alert-dialog-description">
           {mensaje}
         </DialogContentText>
       </DialogContent>
+      }
       <DialogActions sx={{ backgroundColor: colors.grey[800]}}>
+        {!enEspera &&
         <Button 
         autoFocus
         onClick={cerrarModal}
@@ -49,6 +58,7 @@ const ModalMensaje = ({ abrir, cerrarModal, titulo, mensaje }) => {
         >
           OK
         </Button>
+        }
       </DialogActions>
     </Dialog>
   );

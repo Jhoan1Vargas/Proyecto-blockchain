@@ -5,10 +5,10 @@ const { actualizarBalanceWallet } = require("../models/walletModel");
 async function guardarTransaccion(transaccion) {
   const query = `
     INSERT INTO Transaccion 
-      (HashTx, IdWalletOrigen, IdUsuarioOrigen, IdWalletDestino, IdUsuarioDestino, Monto, 
+      (HashTx, Tipo, IdWalletOrigen, IdUsuarioOrigen, IdWalletDestino, IdUsuarioDestino, Monto, 
       BalanceOrigenAntes, BalanceOrigenDespues, BalanceDestinoAntes, BalanceDestinoDespues, Estado, Red) 
     VALUES 
-      (@HashTx, @IdWalletOrigen, @IdUsuarioOrigen, @IdWalletDestino, @IdUsuarioDestino, @Monto, 
+      (@HashTx, @Tipo, @IdWalletOrigen, @IdUsuarioOrigen, @IdWalletDestino, @IdUsuarioDestino, @Monto, 
       @BalanceOrigenAntes, @BalanceOrigenDespues, @BalanceDestinoAntes, @BalanceDestinoDespues, @Estado, @Red);
     SELECT SCOPE_IDENTITY() AS id;
   `;
@@ -17,6 +17,7 @@ async function guardarTransaccion(transaccion) {
     const pool = await poolPromise;
     const result = await pool.request()
       .input("HashTx",                transaccion.HashTx)
+      .input("Tipo",                  transaccion.Tipo)
       .input("IdWalletOrigen",        transaccion.IdWalletOrigen)
       .input("IdUsuarioOrigen",       transaccion.IdUsuarioOrigen)
       .input("IdWalletDestino",       transaccion.IdWalletDestino)
@@ -57,9 +58,9 @@ async function actualizarEstadoTransaccion(id,transaccion) {
       .input("Id",                    id)
       .query(query);
 
-    if (transaccion.estado === 'A') {
-      await actualizarBalanceWallet(transaccion.IdUsuarioOrigen, transaccion.IdWalletOrigen, (-1 * transaccion.Monto));
-      await actualizarBalanceWallet(transaccion.IdUsuarioDestino, transaccion.IdWalletDestino, transaccion.Monto);
+    if (transaccion.Estado === 'A') {
+      await actualizarBalanceWallet(transaccion.IdWalletOrigen,  transaccion.IdUsuarioOrigen, (-1 * transaccion.Monto));
+      await actualizarBalanceWallet(transaccion.IdWalletDestino, transaccion.IdUsuarioDestino,  transaccion.Monto);
     }
 
     return result.rowsAffected[0] > 0;

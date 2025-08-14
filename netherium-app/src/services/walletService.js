@@ -24,7 +24,6 @@ export const agregarWallet = async (usuario) => {
   try {
     const response = await api.post(`${API_URL}/${usuario.Id}/crear`);   
     const data = response.data;
-    console.log(data);
 
     if (data && data.esValido === true) {
       return { esValido: true, data };

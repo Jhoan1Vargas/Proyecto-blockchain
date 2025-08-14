@@ -6,9 +6,9 @@ import Dashboard from "./scenes/dashboard";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import LoginForm from "./scenes/loginForm/LoginForm";
-import Team from "./scenes/team/team";
-import Wallet from "./scenes/wallet/wallet"
-import Form from "./scenes/form";
+import Team from "./scenes/team/Team";
+import Wallet from "./scenes/wallet/Wallet";
+import Compra from "./scenes/compra/Compra";
 
 
 function App() {
@@ -31,14 +31,7 @@ function App() {
               <Route path="/dashboard" element ={<Dashboard/>}/>
               <Route path="/team" element ={<Team abrirForm={true}/>}/>
               <Route path="/wallet" element ={<Wallet abrirForm={true}/>}/>
-              {/*<Route path="/contacts" element  ={<Contacts/>}/>*/}
-              {/* <Route path="/invoices" element  ={<Invoices/>}/> */}
-              <Route path="/form" element ={<Form/>}/>
-              {/* <Route path="/bar" element  ={<Bar/>}/> */}
-              {/* <Route path="/pie" element  ={<Pie/>}/> */}
-              {/* <Route path="/line" element  ={<Line/>}/> */}
-              {/* <Route path="/faq" element  ={<FAQ/>}/> */}
-              {/* <Route path="/geography" element  ={<Geography/>}/> */}
+              <Route path="/compra" element ={<Compra abrirForm={true}/>}/>
             </Routes>
           </main>
         </div>

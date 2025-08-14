@@ -434,7 +434,7 @@ const ModalUsuario = ({ abrir, cerrarModal, onSubmit, usuarioEditar, origen }) =
                   >
                     {errors.estado}
                   </Typography>
-                )}
+                  )}
                 </FormControl>
                 }
 
