@@ -5,12 +5,12 @@ import * as yup from "yup";
 import Header from "../../components/Header";
 import { useState, useContext, useEffect } from 'react';
 import { obtenerWallets } from "../../services/walletService"
-import { realizarCompra, obtenerPrecioETH } from "../../services/transService"
+import { realizarVenta, obtenerPrecioETH } from "../../services/transService"
 import { GlobalContext } from "../../components/GlobalContext"
 import ModalMensaje from "../../components/ModalMensaje";
 
 
-const Compra = ({abrirForm}) => {
+const Venta = ({abrirForm}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [wallets, setWallets] = useState([]);
@@ -52,8 +52,8 @@ const Compra = ({abrirForm}) => {
     try 
     {
       const transaccion = {
-        idUsuarioDestino: usuarioActual.Id,
-        idWalletDestino: values.idWallet,
+        idUsuarioOrigen: usuarioActual.Id,
+        idWalletOrigen: values.idWallet,
         monto: parseFloat(values.montoETH.replace(/,/g, "")),
       }
 
@@ -62,23 +62,22 @@ const Compra = ({abrirForm}) => {
       values.montoUSD = "";
       values.tarjeta = "";
 
-
-      setTituloMensaje("Realizando Compra de Ethereum...");
-      setContenidoMensaje("Esperando que se realice la compra de Ethereum");
+      setTituloMensaje("Realizando Venta de Ethereum...");
+      setContenidoMensaje("Esperando que se realice la venta de Ethereum");
       setEnEspera(true)
       setAbrirModalMensaje(true)
 
-      const data = await realizarCompra(transaccion);
+      const data = await realizarVenta(transaccion);
 
       if(!data.esValido) {
         setTituloMensaje("Situación inesperada");
-        setContenidoMensaje(!data.error ? "Error inesperado al realizar la compra de Ethereum" : data.error);
+        setContenidoMensaje(!data.error ? "Error inesperado al realizar la venta de Ethereum" : data.error);
         setEnEspera(false);
         setAbrirModalMensaje(true);
         return;
       }
 
-      setTituloMensaje("Compra de Ethereum Exitosa");
+      setTituloMensaje("Venta de Ethereum Exitosa");
       setContenidoMensaje(data.mensaje);
       setEnEspera(false);
       setAbrirModalMensaje(true);
@@ -87,8 +86,9 @@ const Compra = ({abrirForm}) => {
       CargarTasaCambio();
 
     } catch (error) {
+
       setTituloMensaje("Error inesperado");
-      setContenidoMensaje(error ? "Error inesperado al realizar la compra de Ethereum" : error);
+      setContenidoMensaje(error ? "Error inesperado al realizar la venta de Ethereum" : error);
       setEnEspera(false);
       setAbrirModalMensaje(true)
 
@@ -97,7 +97,7 @@ const Compra = ({abrirForm}) => {
 
   return (
     <Box m="20px">
-      <Header title="Comprar Ethereum" subtitle="Realizar compra de Ethereum" />
+      <Header title="Vender Ethereum" subtitle="Realizar venta de Ethereum" />
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
@@ -151,7 +151,7 @@ const Compra = ({abrirForm}) => {
                       color: touched.idWallet && errors.idWallet
                         ? colors.blueAccent[300]  // Si hay error
                         : colors.grey[300],      // Si no hay error
-                        fontWeight: "normal"
+                        fontWeight: "bold"
                     },
                 }}
                 error={!!touched.idWallet && !!errors.idWallet}
@@ -217,7 +217,7 @@ const Compra = ({abrirForm}) => {
                   values.idWallet ? 
                   `${(wallets.find(w => w.Id === values.idWallet)?.Balance * tasaCambio).toLocaleString(undefined, {
                     minimumFractionDigits: 2,
-                    maximumFractionDigits: 2 
+                    maximumFractionDigits: 2
                   }) ?? 0} USD` 
                   : ""
                 }
@@ -378,7 +378,7 @@ const Compra = ({abrirForm}) => {
                     color: touched.montoUSD && errors.montoUSD
                       ? colors.blueAccent[300]  // Si hay error
                       : colors.grey[300],      // Si no hay error
-                      fontWeight: "normal",
+                      fontWeight: "bold",
                   },
                 }}
                 value={values.montoUSD.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
@@ -434,7 +434,7 @@ const Compra = ({abrirForm}) => {
                     color: touched.montoETH && errors.montoETH
                       ? colors.blueAccent[300]  // Si hay error
                       : colors.grey[300],      // Si no hay error
-                      fontWeight: "normal",
+                      fontWeight: "bold",
                   },
                 }}
                 value={values.montoETH}
@@ -474,7 +474,7 @@ const Compra = ({abrirForm}) => {
                     color={colors.grey[100]}
                     fontWeight= "bold"
                   >
-                  Realizar Compra de Ethereum
+                  Realizar Venta de Ethereum
                   </Typography>
                 </Button>
               </Box>
@@ -526,4 +526,4 @@ const initialValues = {
   tarjeta: "",
 };
 
-export default Compra;
+export default Venta;

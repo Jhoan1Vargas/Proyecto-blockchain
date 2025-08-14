@@ -13,6 +13,7 @@ import { agregarWallet, obtenerWallets } from "../../services/walletService"
 import  ModalMensaje  from "../../components/ModalMensaje"
 import { GlobalContext } from "../../components/GlobalContext"
 import { format } from 'date-fns'
+import { obtenerPrecioETH } from "../../services/transService"
 
 
 
@@ -35,6 +36,17 @@ const Wallet = (abrirForm) => {
 
   const [wallets, setWallets] = useState([]);
   const { usuarioActual, textoBusqueda } = useContext(GlobalContext);
+
+  const [tasaCambio, setTasaCambio] = useState(1);
+
+  const CargarTasaCambio = async () => {
+    try {
+        const data = await obtenerPrecioETH();
+        setTasaCambio(data.tasa || 1);
+      } catch (error) {
+        console.error("Error cargando wallets:", error);
+      }
+  }
 
   const walletsFiltrados = !!!wallets? [] : wallets.filter((wallet) =>{
     
@@ -106,14 +118,14 @@ const Wallet = (abrirForm) => {
     },
     {
       field: "Balance",
-      headerName: "Balance",
+      headerName: "Balance ETH",
       flex: 1,
       cellClassName: "objeto-centrado--cell",
       headerClassName: "custom-header",
       renderCell: ({row}) => {
         const balanceFormateado = Number(row.Balance).toLocaleString(undefined, {
           minimumFractionDigits: 2,
-          maximumFractionDigits: 8,
+          maximumFractionDigits: 18,
         });
 
         return(
@@ -125,6 +137,31 @@ const Wallet = (abrirForm) => {
             gap="10%"
           >
           <Typography>{`${balanceFormateado} ETH`}</Typography>
+          </Box>
+        );
+      }
+    },
+    {
+      field: "BalanceUSD",
+      headerName: "Balance USD",
+      flex: 1,
+      cellClassName: "objeto-centrado--cell",
+      headerClassName: "custom-header",
+      renderCell: ({row}) => {
+        const balanceFormateado = Number(row.Balance * tasaCambio).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+
+        return(
+          <Box
+            display="flex"
+            justifyContent="left"
+            alignItems="center"
+            width="100%"
+            gap="10%"
+          >
+          <Typography>{`${balanceFormateado} USD`}</Typography>
           </Box>
         );
       }
@@ -170,6 +207,7 @@ const Wallet = (abrirForm) => {
   useEffect(() => {
     if (abrirForm) {
       CargarWallets();
+      CargarTasaCambio();
     }
   }, []);
 
@@ -427,7 +465,7 @@ const Wallet = (abrirForm) => {
             color: colors.grey[100],
             border: "none",
             fontSize: "16px",
-            fontWeight: "bold",
+            fontWeight: "normal",
           },
         }}
       >

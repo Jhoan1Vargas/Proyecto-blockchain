@@ -1,6 +1,6 @@
 import { 
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, useTheme,
-  CircularProgress, Box
+  CircularProgress
 } 
 from "@mui/material";
 import { tokens } from "../theme";

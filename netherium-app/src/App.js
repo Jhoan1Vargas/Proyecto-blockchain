@@ -7,8 +7,9 @@ import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import LoginForm from "./scenes/loginForm/LoginForm";
 import Team from "./scenes/team/Team";
-import Wallet from "./scenes/wallet/Wallet";
+import Wallet from "./scenes/wallet/wallet";
 import Compra from "./scenes/compra/Compra";
+import Venta from "./scenes/venta/Venta";
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
               <Route path="/team" element ={<Team abrirForm={true}/>}/>
               <Route path="/wallet" element ={<Wallet abrirForm={true}/>}/>
               <Route path="/compra" element ={<Compra abrirForm={true}/>}/>
+              <Route path="/venta" element ={<Venta abrirForm={true}/>}/>
             </Routes>
           </main>
         </div>

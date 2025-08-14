@@ -1,16 +1,16 @@
-const { realizarTransaccion, realizarCompra } = require("../controllers/transaccionController");
+const { realizarTransaccion, realizarCompra,realizarVenta } = require("../controllers/transaccionController");
 
 async function main() {
   const req = {
     body: {
-      idUsuarioDestino: 2,
-      idWalletDestino: 1,
-      monto: 50,
+      idUsuarioOrigen: 2,
+      idWalletOrigen: 1,
+      monto: 0.0001,
     }
   };
   const res = null;
 
-  await realizarCompra(req, res);
+  await realizarVenta(req, res);
 
 }
 

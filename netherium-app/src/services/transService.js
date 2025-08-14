@@ -45,6 +45,29 @@ export const realizarCompra = async (transaccion) => {
   }
 };
 
+export const realizarVenta = async (transaccion) => {
+  try {
+    const response = await api.post(
+    `${API_URL}/venta`,
+    {
+      idUsuarioOrigen: transaccion.idUsuarioOrigen,
+      idWalletOrigen: transaccion.idWalletOrigen,
+      monto: transaccion.monto,
+    });
+    const data = response.data;
+
+    if (data && data.esValido === true) {
+      return { esValido: true, mensaje: data?.mensaje };
+    } else {
+      return { esValido: false, error: data?.mensaje|| "Error desconocido" };
+    }
+  } catch (error) {
+    return {
+      esValido: false,
+      error: error.response?.data?.mensaje || "Error de conexión con el servidor",
+    };
+  }
+};
 
 export const obtenerPrecioETH = async () => {
   try {
