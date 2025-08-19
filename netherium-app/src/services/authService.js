@@ -71,7 +71,6 @@ export const modificarUsuario = async (usuario) => {
       `${API_URL}/usuarios/${usuario.id}`, 
       { 
         nombre: usuario.nombre, 
-        clave: usuario.clave, 
         correo: usuario.correo, 
         idrol: usuario.idrol, 
         estado: usuario.estado,

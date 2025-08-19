@@ -303,7 +303,7 @@ return (
                 {format(transaction.FechaCreacion.replace("Z",""), "dd/MM/yyyy hh:mm:ss a")}
             </Box>
             <Box
-            backgroundColor={colors.greenAccent[600]}
+            backgroundColor={colors.greenAccent[700]}
             p="5px 10px"
             borderRadius="4px"
             >

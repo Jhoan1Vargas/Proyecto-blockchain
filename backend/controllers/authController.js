@@ -77,13 +77,13 @@ async function agregarUsuario(req, res) {
 
 async function modificarUsuario(req, res) {
   const id = req.params.id;
-  const { nombre, clave, correo, idrol, estado } = req.body;
+  const { nombre, correo, idrol, estado } = req.body;
 
   try {
     const usuario = await buscarUsuarioPorId(id);
     if (!usuario) return res.status(404).json({ mensaje: "No se pudo encontrar el usuario a modificar", esValido: false });
 
-    const filas = await actualizarUsuario(id ,nombre, clave, correo, idrol, estado);
+    const filas = await actualizarUsuario(id ,nombre, correo, idrol, estado);
 
     if (filas <= 0) {
       return res.status(400).json({ mensaje: "No se pudo actualizar los datos del usuario", esValido: false });

@@ -141,13 +141,15 @@ const Sidebar = () => {
                 Registros
               </Typography>
 
+              {usuarioActual.idRol === 1 &&
               <Item
               title="Usuarios"
               to="/team"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+              />
+              }
 
               {/* <Item
               title="Mi Perfil"

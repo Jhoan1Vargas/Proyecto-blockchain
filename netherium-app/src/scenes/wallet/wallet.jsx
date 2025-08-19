@@ -464,7 +464,7 @@ const Wallet = (abrirForm) => {
             color: colors.grey[100],
             border: "none",
             fontSize: "16px",
-            fontWeight: "normal",
+            fontWeight: "bold",
           },
         }}
       >

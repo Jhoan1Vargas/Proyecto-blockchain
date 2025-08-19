@@ -31,7 +31,7 @@ const Item = ({ title, to, icon, }) => {
       </Box>
 
       {/* Título */}
-      <Typography variant="h3" gutterBottom fontWeight="bold">
+      <Typography align="center" variant="h3" gutterBottom fontWeight="bold">
         {title}
       </Typography>
 

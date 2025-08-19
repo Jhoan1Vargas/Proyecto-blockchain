@@ -71,22 +71,19 @@ async function insertarUsuario(nombre, clave, correo, idrol, estado) {
 }
 
 
-async function actualizarUsuario(id, nombre, clave, correo, idrol, estado) {
+async function actualizarUsuario(id, nombre, correo, idrol, estado) {
   const pool = await poolPromise;
-  const hashedClave = await hashClave(clave);
 
   const result = await pool
     .request()
     .input("id", id)
     .input("nombre", nombre)
-    .input("clave", hashedClave)
     .input("correo", correo)
     .input("idrol", idrol)
     .input("estado", estado)
     .query(`
       UPDATE Usuario SET 
       Nombre = @nombre,
-      Contrasena = @clave,
       Correo = @correo,
       IdRol = @idrol,
       Estado = @estado

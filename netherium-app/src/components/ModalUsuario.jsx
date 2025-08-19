@@ -75,8 +75,8 @@ const ModalUsuario = ({ abrir, cerrarModal, onSubmit, usuarioEditar, origen }) =
         correoHabilitado: true,
         idRolVisible: true,
         idRolHabilitado: true,
-        estadoVisible: false,
-        estadoHabilidato: false,
+        estadoVisible: true,
+        estadoHabilidato: true,
       });
 
     }
