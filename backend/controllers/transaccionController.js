@@ -14,9 +14,13 @@ const realizarTransaccion = async (req, res) => {
   } = req.body;
 
   try {
+    if (idUsuarioOrigen === idUsuarioDestino && idWalletOrigen === idWalletDestino){
+      return res.status(400).json({ mensaje: "No se puede hacer una transferencia a la misma wallet", esValido: false });
+    }
+    
     const tieneBalance = await tieneBalanceDisponible({idUsuario: idUsuarioOrigen, idWallet: idWalletOrigen, monto: monto})
     if (!tieneBalance) {
-      return res.status(400).json({ mensaje: "No hay balance disponible para realizar la compra", esValido: false });
+      return res.status(400).json({ mensaje: "No hay balance disponible para realizar la transferencia", esValido: false });
     }
 
     const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
@@ -92,7 +96,7 @@ const realizarTransaccion = async (req, res) => {
       IdUsuarioOrigen:        idUsuarioOrigen,
       IdWalletDestino:        idWalletDestino,
       IdUsuarioDestino:       idUsuarioDestino,
-      Monto:                  montoUsado,
+      Monto:                  monto,
       BalanceOrigenAntes:     balanceOrigenAntes.toString(),
       BalanceOrigenDespues:   balanceOrigenDespues.toString(),
       BalanceDestinoDespues:  balanceDestinoDespues.toString(),

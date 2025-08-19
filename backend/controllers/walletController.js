@@ -2,6 +2,7 @@ const { Wallet, JsonRpcProvider } = require("ethers");
 const { 
   buscarWalletPorIdUsuario,
   guardarWalletIdUsuario,
+  buscarWallets,
 } = require("../models/walletModel");
 
 const provider = new JsonRpcProvider("http://127.0.0.1:8545");
@@ -52,7 +53,25 @@ const buscarWalletsUsuario = async (req, res) => {
   }
 }
 
+const consultaWallets = async (req, res) => {
+  const { idUsuarioExcluido } = req.body;
+  try {
+
+    const wallets = await buscarWallets(idUsuarioExcluido);
+
+    if (!wallets) {
+      return res.status(404).json({ mensaje: "No se pudo encontrar ninguna wallet relacionada al usuario", esValido: false });
+    }
+
+    res.status(201).json({ mensaje: "Consulta de Wallets", esValido: true, wallets: wallets });
+  } catch (err) {
+    console.error("Error al consultar wallets:", err);
+    res.status(500).json({ mensaje: "Error interno del servidor" });
+  }
+}
+
 module.exports = { 
   crearWallet,
-  buscarWalletsUsuario 
+  buscarWalletsUsuario, 
+  consultaWallets,
 };

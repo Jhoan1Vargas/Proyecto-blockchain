@@ -60,6 +60,20 @@ async function buscarIdWalletPorId(id, idUsuario) {
   return result.recordset.length === 0 ? null : result.recordset[0];
 }
 
+async function buscarWallets(idUsuarioExcluido) {
+  const pool = await poolPromise;
+  const result = await pool
+    .request()
+    .query(`
+      SELECT Id, IdUsuario, Direccion, LlavePrivada, Mnemonic, Balance
+      FROM Wallet
+      WHERE IdUsuario NOT IN (1 ${idUsuarioExcluido ? `,${idUsuarioExcluido}`:""})
+    `);
+
+  return result.recordset;
+}
+
+
 async function actualizarBalanceWallet(id, idUsuario, monto) {
   const pool = await poolPromise;
   const result = await pool
@@ -107,4 +121,5 @@ module.exports = {
   buscarIdWalletPorId,
   actualizarBalanceWallet,
   tieneBalanceDisponible,
+  buscarWallets,
 }
