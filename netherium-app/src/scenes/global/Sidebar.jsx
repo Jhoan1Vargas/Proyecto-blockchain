@@ -175,7 +175,7 @@ const Sidebar = () => {
 
             <Item
               title="Transacciones"
-              to="/compra"
+              to="/transacciones"
               icon={<PaidOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

@@ -3,23 +3,31 @@ import apiCoinGecko from "../apiCoinGecko";
 
 const API_URL = "/api/transaccion";
 
-// export const realizarTransaccion = async (usuario) => {
-//   try {
-//     const response = await api.get(`${API_URL}/${usuario.Id}`);
-//     const data = response.data;
+export const realizarTransferencia = async (transaccion) => {
+  try {
+    const response = await api.post(
+    `${API_URL}`,
+    {
+      idUsuarioOrigen: transaccion.idUsuarioOrigen,
+      idWalletOrigen: transaccion.idWalletOrigen,
+      idUsuarioDestino: transaccion.idUsuarioDestino,
+      idWalletDestino: transaccion.idWalletDestino,
+      monto: transaccion.monto,
+    });
+    const data = response.data;
 
-//     if (data && data.esValido === true) {
-//       return { esValido: true, wallets: data.wallets };
-//     } else {
-//       return { esValido: false, error: data?.mensaje|| "Error desconocido" };
-//     }
-//   } catch (error) {
-//     return {
-//       esValido: false,
-//       error: error.response?.data?.mensaje || "Error de conexión con el servidor",
-//     };
-//   }
-// };
+    if (data && data.esValido === true) {
+      return { esValido: true, mensaje: data?.mensaje };
+    } else {
+      return { esValido: false, error: data?.mensaje|| "Error desconocido" };
+    }
+  } catch (error) {
+    return {
+      esValido: false,
+      error: error.response?.data?.mensaje || "Error de conexión con el servidor",
+    };
+  }
+};
 
 export const realizarCompra = async (transaccion) => {
   try {

@@ -10,6 +10,8 @@ import Team from "./scenes/team/Team";
 import Wallet from "./scenes/wallet/wallet";
 import Compra from "./scenes/compra/Compra";
 import Venta from "./scenes/venta/Venta";
+import Transferencia from "./scenes/transferencia/Transferencia";
+import Transacciones from "./scenes/transacciones/Transacciones";
 
 
 function App() {
@@ -34,6 +36,9 @@ function App() {
               <Route path="/wallet" element ={<Wallet abrirForm={true}/>}/>
               <Route path="/compra" element ={<Compra abrirForm={true}/>}/>
               <Route path="/venta" element ={<Venta abrirForm={true}/>}/>
+              <Route path="/transacciones" element ={<Transacciones/>}/>
+              <Route path="/transferencia/propias" element ={<Transferencia abrirForm={true} usarWalletPropias={true}/>}/>
+              <Route path="/transferencia" element ={<Transferencia abrirForm={true} usarWalletPropias={false}/>}/>
             </Routes>
           </main>
         </div>

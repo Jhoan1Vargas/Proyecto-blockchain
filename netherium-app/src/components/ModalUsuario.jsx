@@ -217,6 +217,7 @@ const ModalUsuario = ({ abrir, cerrarModal, onSubmit, usuarioEditar, origen }) =
                       color: touched.userName && errors.userName
                         ? colors.blueAccent[300]  // Si hay error
                         : colors.grey[300],      // Si no hay error
+                        font:"bold",
                     },
                   }}
                 />

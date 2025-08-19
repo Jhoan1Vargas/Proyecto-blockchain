@@ -4,17 +4,20 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import Header from "../../components/Header";
 import { useState, useContext, useEffect } from 'react';
-import { obtenerWallets } from "../../services/walletService"
-import { realizarVenta, obtenerPrecioETH } from "../../services/transService"
+import { obtenerWallets, obtenerTodasWallets } from "../../services/walletService"
+import { realizarTransferencia, obtenerPrecioETH } from "../../services/transService"
+import { obtenerUsuarios } from "../../services/authService"
 import { GlobalContext } from "../../components/GlobalContext"
 import ModalMensaje from "../../components/ModalMensaje";
 import { Link } from "react-router-dom";
 
 
-const Venta = ({abrirForm}) => {
+const Transferencia = ({abrirForm, usarWalletPropias}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [wallets, setWallets] = useState([]);
+  const [walletsOrigen, setWalletsOrigen] = useState([]);
+  const [walletsDestino, setWalletsDestino] = useState([]);
+  const [usuariosDestino, setUsuariosDestino] = useState([]);
   const { usuarioActual } = useContext(GlobalContext);
   const [balanceFocus, setBalanceFocus] = useState(false);
   const [tasaCambio, setTasaCambio] = useState(1);
@@ -24,12 +27,41 @@ const Venta = ({abrirForm}) => {
   const [contenidoMensaje, setContenidoMensaje] = useState("");
   const [enEspera, setEnEspera] = useState(false);
 
-  const CargarWallets = async () => {
+  const CargarWalletsOrigen = async () => {
     try {
         const data = await obtenerWallets(!usuarioActual ? {Id: 0} : usuarioActual);
-        setWallets(data.wallets);
+        setWalletsOrigen(data.wallets);
       } catch (error) {
-        console.error("Error cargando wallets:", error);
+        console.error("Error cargando wallets de origen:", error);
+      }
+  }
+
+  const CargarUsuariosDestino = async () => {
+    try {
+        const data = await obtenerUsuarios();
+        const usuarios = data.usuarios;
+        const usuariosFiltrados = usuarios.filter(u => usarWalletPropias ?  u.Id === usuarioActual.Id : u.Id !== usuarioActual.Id && u.Id !== 1 && u.Estado === "A");
+        setUsuariosDestino(usuariosFiltrados);
+      } catch (error) {
+        console.error("Error cargando usuarios de destino:", error);
+      }
+  }
+
+  const CargarWalletsDestino = async (idUsuarioDestino) => {
+    try {
+        if (usarWalletPropias)
+        {
+          const data = await obtenerWallets(!usuarioActual ? {Id: 0} : usuarioActual);
+          setWalletsDestino(data.wallets);
+          return;
+        }
+
+        const data = await obtenerTodasWallets(!usuarioActual ? {Id: 0} : usuarioActual);
+        const wallets = data.wallets;
+        const walletsFiltradas = idUsuarioDestino ? wallets.filter(w => w.IdUsuario === idUsuarioDestino) : wallets;
+        setWalletsDestino(walletsFiltradas);
+      } catch (error) {
+        console.error("Error cargando wallets de destino:", error);
       }
   }
 
@@ -44,7 +76,9 @@ const Venta = ({abrirForm}) => {
 
   useEffect(() => {
     if (abrirForm) {
-      CargarWallets();
+      CargarWalletsOrigen();
+      CargarWalletsDestino();
+      CargarUsuariosDestino();
       CargarTasaCambio();
     }
   }, []);
@@ -54,42 +88,47 @@ const Venta = ({abrirForm}) => {
     {
       const transaccion = {
         idUsuarioOrigen: usuarioActual.Id,
-        idWalletOrigen: values.idWallet,
+        idWalletOrigen: values.idWalletOrigen,
+        idUsuarioDestino: values.idUsuarioDestino,
+        idWalletDestino: values.idWalletDestino,
         monto: parseFloat(values.montoETH.replace(/,/g, "")),
       }
 
-      values.idWallet = "";
+      values.idUsuarioDestino = "";
+      values.idWalletOrigen = "";
+      values.idWalletDestino = "";
       values.montoETH = "";
       values.montoUSD = "";
       values.tarjeta = "";
 
-      setTituloMensaje("Realizando Venta de Ethereum...");
+      setTituloMensaje("Realizando Transferencia de Ethereum...");
       setContenidoMensaje("Esperando que se realice la venta de Ethereum");
       setEnEspera(true)
       setAbrirModalMensaje(true)
 
-      const data = await realizarVenta(transaccion);
+      const data = await realizarTransferencia(transaccion);
 
       if(!data.esValido) {
         setTituloMensaje("Situación inesperada");
-        setContenidoMensaje(!data.error ? "Error inesperado al realizar la venta de Ethereum" : data.error);
+        setContenidoMensaje(!data.error ? "Error inesperado al realizar la transferencia de Ethereum" : data.error);
         setEnEspera(false);
         setAbrirModalMensaje(true);
         return;
       }
 
-      setTituloMensaje("Venta de Ethereum Exitosa");
+      setTituloMensaje("Transferencia de Ethereum Exitosa");
       setContenidoMensaje(data.mensaje);
       setEnEspera(false);
       setAbrirModalMensaje(true);
 
-      CargarWallets();
-      // CargarTasaCambio();
+      CargarWalletsOrigen();
+      CargarWalletsDestino();
+      CargarTasaCambio();
 
     } catch (error) {
 
       setTituloMensaje("Error inesperado");
-      setContenidoMensaje(error ? "Error inesperado al realizar la venta de Ethereum" : error);
+      setContenidoMensaje(error ? "Error inesperado al realizar la transferencia de Ethereum" : error);
       setEnEspera(false);
       setAbrirModalMensaje(true)
 
@@ -98,7 +137,7 @@ const Venta = ({abrirForm}) => {
 
   return (
     <Box m="20px">
-      <Header title="Vender Ethereum" subtitle="Realizar venta de Ethereum" />
+      <Header title="Transferencia de Ethereum" subtitle={usarWalletPropias ? "Realizar transferencia entre mis wallets" : "Realizar transferencia a terceros"} />
       <Formik
         onSubmit={handleFormSubmit}
         initialValues={initialValues}
@@ -136,47 +175,47 @@ const Venta = ({abrirForm}) => {
                         borderBottomColor: colors.blueAccent[300], 
                       },
                       '&:before': {
-                        borderBottomColor: !!touched.idWallet && !!errors.idWallet ? colors.blueAccent[300] : colors.grey[600],
+                        borderBottomColor: !!touched.idWalletOrigen && !!errors.idWalletOrigen ? colors.blueAccent[300] : colors.grey[600],
                       },
                       '&:hover:not(.Mui-disabled):before': {
-                        borderBottomColor: !!touched.idWallet && !!errors.idWallet ? colors.blueAccent[300] : colors.grey[400], 
+                        borderBottomColor: !!touched.idWalletOrigen && !!errors.idWalletOrigen ? colors.blueAccent[300] : colors.grey[400], 
                       },
                     },
                     '& .MuiInputLabel-root': {
-                      color: values.idWallet ? colors.grey[300] : colors.grey[100] ,
+                      color: values.idWalletOrigen ? colors.grey[300] : colors.grey[100] ,
                     },
                     '& .MuiInputLabel-root.Mui-focused': {
                       color: colors.grey[300] ,
                     },
                     "& .MuiFormHelperText-root": {
-                      color: touched.idWallet && errors.idWallet
+                      color: touched.idWalletOrigen && errors.idWalletOrigen
                         ? colors.blueAccent[300]  // Si hay error
                         : colors.grey[300],      // Si no hay error
                         fontWeight: "bold"
                     },
                 }}
-                error={!!touched.idWallet && !!errors.idWallet}
+                error={!!touched.idWalletOrigen && !!errors.idWalletOrigen}
               >
                 <Autocomplete
-                  options={wallets.sort((a,b) => a.Id - b.Id)}
+                  options={walletsOrigen.sort((a,b) => a.Id - b.Id)}
                   noOptionsText="No se encontraron wallets"
                   getOptionLabel={(wallet) =>
                     `${wallet.Id} - ${wallet.Direccion}`
                   }
-                  value={wallets.find(w => w.Id === values.idWallet) || null}
+                  value={walletsOrigen.find(w => w.Id === values.idWalletOrigen) || null}
                   onChange={(event, newValue) => {
                     handleChange({
-                      target: { name: "idWallet", value: newValue ? newValue.Id : "" }
+                      target: { name: "idWalletOrigen", value: newValue ? newValue.Id : "" }
                     });
                   }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Wallet"
+                      label="Wallet de Origen"
                       variant="filled"
                       onBlur={handleBlur}
-                      error={!!touched.idWallet && !!errors.idWallet}
-                      helperText={touched.idWallet && errors.idWallet ? errors.idWallet : ""}
+                      error={!!touched.idWalletOrigen && !!errors.idWalletOrigen}
+                      helperText={touched.idWalletOrigen && errors.idWalletOrigen ? errors.idWalletOrigen : ""}
                     />
                   )}
                 />
@@ -203,7 +242,7 @@ const Venta = ({abrirForm}) => {
                     },
                   },
                   '& .MuiInputLabel-root': {
-                    color: values.idWallet ? colors.grey[300]: colors.grey[100] ,
+                    color: values.idWalletOrigen ? colors.grey[300]: colors.grey[100] ,
                   },
                   '& .MuiInputLabel-root.Mui-focused': {
                     color: colors.grey[300] ,
@@ -215,8 +254,8 @@ const Venta = ({abrirForm}) => {
                   },
                 }}
                 value={
-                  values.idWallet ? 
-                  `${(wallets.find(w => w.Id === values.idWallet)?.Balance * tasaCambio).toLocaleString(undefined, {
+                  values.idWalletOrigen ? 
+                  `${(walletsOrigen.find(w => w.Id === values.idWalletOrigen)?.Balance * tasaCambio).toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                   }) ?? 0} USD` 
@@ -227,7 +266,7 @@ const Venta = ({abrirForm}) => {
                     readOnly: true, 
                   }, 
                   inputLabel:{
-                    shrink: values.idWallet || balanceFocus ? true : false,
+                    shrink: values.idWalletOrigen || balanceFocus ? true : false,
                   }
                 }}
                 onFocus={() => setBalanceFocus(true)}
@@ -255,7 +294,7 @@ const Venta = ({abrirForm}) => {
                     },
                   },
                   '& .MuiInputLabel-root': {
-                    color: values.idWallet ? colors.grey[300]: colors.grey[100] ,
+                    color: values.idWalletOrigen ? colors.grey[300]: colors.grey[100] ,
                   },
                   '& .MuiInputLabel-root.Mui-focused': {
                     color: colors.grey[300] ,
@@ -267,8 +306,8 @@ const Venta = ({abrirForm}) => {
                   },
                 }}
                 value={
-                  values.idWallet ? 
-                  `${wallets.find(w => w.Id === values.idWallet)?.Balance.toLocaleString(undefined, {
+                  values.idWalletOrigen ? 
+                  `${walletsOrigen.find(w => w.Id === values.idWalletOrigen)?.Balance.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 18 
                   }) ?? 0} ETH` 
@@ -279,12 +318,127 @@ const Venta = ({abrirForm}) => {
                     readOnly: true, 
                   }, 
                   inputLabel:{
-                    shrink: values.idWallet || balanceFocus ? true : false,
+                    shrink: values.idWalletOrigen || balanceFocus ? true : false,
                   }
                 }}
                 onFocus={() => setBalanceFocus(true)}
                 onBlur ={() => setBalanceFocus(false)}
               />
+              {!usarWalletPropias && <FormControl
+                fullWidth
+                variant="filled"
+                sx={{ 
+                  gridColumn: "span 2",
+                  '& .MuiFilledInput-root': {
+                      color: colors.grey[100],
+                      '&:after': {
+                        borderBottomColor: colors.blueAccent[300], 
+                      },
+                      '&:before': {
+                        borderBottomColor: !!touched.idUsuarioDestino && !!errors.idUsuarioDestino ? colors.blueAccent[300] : colors.grey[600],
+                      },
+                      '&:hover:not(.Mui-disabled):before': {
+                        borderBottomColor: !!touched.idUsuarioDestino && !!errors.idUsuarioDestino ? colors.blueAccent[300] : colors.grey[400], 
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: values.idUsuarioDestino ? colors.grey[300] : colors.grey[100] ,
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': {
+                      color: colors.grey[300] ,
+                    },
+                    "& .MuiFormHelperText-root": {
+                      color: touched.idUsuarioDestino && errors.idUsuarioDestino
+                        ? colors.blueAccent[300]  // Si hay error
+                        : colors.grey[300],      // Si no hay error
+                        fontWeight: "bold"
+                    },
+                }}
+                error={!!touched.idUsuarioDestino && !!errors.idUsuarioDestino}
+              >
+                <Autocomplete
+                  disabled = {usarWalletPropias}
+                  options={usuariosDestino.sort((a,b) => a.Id - b.Id)}
+                  noOptionsText="No se encontraron usuarios"
+                  getOptionLabel={(usuario) =>
+                    `${usuario.Id} - ${usuario.Nombre}`
+                  }
+                  value={usuariosDestino.find(u => u.Id === values.idUsuarioDestino) || null}
+                  onChange={(event, newValue) => {
+                    handleChange({
+                      target: { name: "idUsuarioDestino", value: newValue ? newValue.Id : "" }
+                    });
+                    CargarWalletsDestino(newValue ? newValue.Id : null);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Usuario Destino"
+                      variant="filled"
+                      onBlur={handleBlur}
+                      error={!!touched.idUsuarioDestino && !!errors.idUsuarioDestino}
+                      helperText={touched.idUsuarioDestino && errors.idUsuarioDestino ? errors.idUsuarioDestino : ""}
+                    />
+                  )}
+                />
+              </FormControl>}
+              <FormControl
+                fullWidth
+                variant="filled"
+                sx={{ 
+                  gridColumn: usarWalletPropias ? "span 4" : "span 2",
+                  '& .MuiFilledInput-root': {
+                      color: colors.grey[100],
+                      '&:after': {
+                        borderBottomColor: colors.blueAccent[300], 
+                      },
+                      '&:before': {
+                        borderBottomColor: !!touched.idWalletDestino && !!errors.idWalletDestino ? colors.blueAccent[300] : colors.grey[600],
+                      },
+                      '&:hover:not(.Mui-disabled):before': {
+                        borderBottomColor: !!touched.idWalletDestino && !!errors.idWalletDestino ? colors.blueAccent[300] : colors.grey[400], 
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: values.idWalletDestino ? colors.grey[300] : colors.grey[100] ,
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': {
+                      color: colors.grey[300] ,
+                    },
+                    "& .MuiFormHelperText-root": {
+                      color: touched.idWalletDestino && errors.idWalletDestino
+                        ? colors.blueAccent[300]  // Si hay error
+                        : colors.grey[300],      // Si no hay error
+                        fontWeight: "bold"
+                    },
+                }}
+                error={!!touched.idWalletDestino && !!errors.idWalletDestino}
+              >
+                <Autocomplete
+                  options={walletsDestino.sort((a,b) => a.Id - b.Id)}
+                  noOptionsText="No se encontraron wallets"
+                  getOptionLabel={(wallet) =>
+                    usarWalletPropias ? `${wallet.Id} - ${wallet.Direccion}` : `${wallet.Direccion}`
+                  }
+                  value={walletsDestino.find(w => w.Id === values.idWalletDestino && w.IdUsuario === values.idUsuarioDestino) || null}
+                  onChange={(event, newValue) => {
+                    handleChange({
+                      target: { name: "idWalletDestino", value: newValue ? newValue.Id : "" }
+                    });
+                    setFieldValue("idUsuarioDestino", newValue ? newValue.IdUsuario : "");
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Wallet Destino"
+                      variant="filled"
+                      onBlur={handleBlur}
+                      error={!!touched.idWalletDestino && !!errors.idWalletDestino}
+                      helperText={touched.idWalletDestino && errors.idWalletDestino ? errors.idWalletDestino : ""}
+                    />
+                  )}
+                />
+              </FormControl>
               <TextField
                 fullWidth
                 variant="filled"
@@ -317,7 +471,7 @@ const Venta = ({abrirForm}) => {
                 value={`1 ETH = ${
                   tasaCambio.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
-                  maximumFractionDigits: 8 
+                  maximumFractionDigits: 2 
                   })
                 } USD`}
                 slotProps={{
@@ -467,7 +621,9 @@ const Venta = ({abrirForm}) => {
                   ":hover": { backgroundColor: colors.blueAccent[700]},
                 }}
                 onClick={() => {
-                  setFieldValue("idWallet", "");
+                  setFieldValue("idUsuarioDestino", "");
+                  setFieldValue("idWalletOrigen", "");
+                  setFieldValue("idWalletDestino", "");
                   setFieldValue("montoUSD", "");
                   setFieldValue("montoETH", "");
                   setFieldValue("tarjeta", "");
@@ -491,7 +647,7 @@ const Venta = ({abrirForm}) => {
                     color={colors.grey[100]}
                     fontWeight= "bold"
                   >
-                  Realizar Venta de Ethereum
+                  Realizar Transferencia de Ethereum
                   </Typography>
                 </Button>
               </Box>
@@ -512,7 +668,9 @@ const Venta = ({abrirForm}) => {
 
 
 const checkoutSchema = yup.object().shape({
-  idWallet: yup.string().trim().required("Campo Requerido"),
+  idUsuarioDestino: yup.string().trim().required("Campo Requerido"),
+  idWalletOrigen: yup.string().trim().required("Campo Requerido"),
+  idWalletDestino: yup.string().trim().required("Campo Requerido"),
   montoUSD: yup
               .number()
               .transform((value, originalValue) => {
@@ -537,10 +695,12 @@ const checkoutSchema = yup.object().shape({
   // tarjeta: yup.string().required("Campo Requerido"),
 });
 const initialValues = {
-  idWallet: "",
+  idUsuarioDestino: "",
+  idWalletOrigen: "",
+  idWalletDestino: "",
   montoUSD: "",
   montoETH: "",
   tarjeta: "",
 };
 
-export default Venta;
+export default Transferencia;

@@ -8,6 +8,7 @@ import { obtenerWallets } from "../../services/walletService"
 import { realizarCompra, obtenerPrecioETH } from "../../services/transService"
 import { GlobalContext } from "../../components/GlobalContext"
 import ModalMensaje from "../../components/ModalMensaje";
+import { Link } from "react-router-dom";
 
 
 const Compra = ({abrirForm}) => {
@@ -84,7 +85,7 @@ const Compra = ({abrirForm}) => {
       setAbrirModalMensaje(true);
 
       CargarWallets();
-      CargarTasaCambio();
+      // CargarTasaCambio();
 
     } catch (error) {
       setTituloMensaje("Error inesperado");
@@ -157,7 +158,7 @@ const Compra = ({abrirForm}) => {
                 error={!!touched.idWallet && !!errors.idWallet}
               >
                 <Autocomplete
-                  options={wallets}
+                  options={wallets.sort((a,b) => a.Id - b.Id)}
                   noOptionsText="No se encontraron wallets"
                   getOptionLabel={(wallet) =>
                     `${wallet.Id} - ${wallet.Direccion}`
@@ -443,7 +444,23 @@ const Compra = ({abrirForm}) => {
               />
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
-              <Box gap="10px" width="40%" display="flex" justifyContent="end">
+              <Box gap="10px" width="50%" display="flex" justifyContent="end">
+                <Button variant="contained" sx={{
+                  flex:0.60,
+                  backgroundColor: colors.redAccent[600],
+                  ":hover": { backgroundColor: colors.redAccent[700]},
+                }}
+                component={Link}
+                to="/transacciones"
+                >
+                  <Typography
+                    variant="h6"
+                    color={colors.grey[100]}
+                    fontWeight= "bold"
+                  >
+                  Salir
+                  </Typography>
+                </Button>
                 <Button variant="contained" sx={{
                   flex:0.60,
                   backgroundColor: colors.blueAccent[600],

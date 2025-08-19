@@ -20,6 +20,26 @@ export const obtenerWallets = async (usuario) => {
   }
 };
 
+export const obtenerTodasWallets = async (UsuarioExcluido) => {
+  try {
+    const response = await api.post(`${API_URL}`,{
+      idUsuarioExcluido: UsuarioExcluido.Id,
+    });
+    const data = response.data;
+
+    if (data && data.esValido === true) {
+      return { esValido: true, wallets: data.wallets };
+    } else {
+      return { esValido: false, error: data?.mensaje|| "Error desconocido" };
+    }
+  } catch (error) {
+    return {
+      esValido: false,
+      error: error.response?.data?.mensaje || "Error de conexión con el servidor",
+    };
+  }
+};
+
 export const agregarWallet = async (usuario) => {
   try {
     const response = await api.post(`${API_URL}/${usuario.Id}/crear`);   
