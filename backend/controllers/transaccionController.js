@@ -1,7 +1,7 @@
 const { ethers } = require("ethers");
-const { guardarTransaccion, actualizarEstadoTransaccion } = require("../models/transaccionModel");
+const { guardarTransaccion, actualizarEstadoTransaccion, buscarTransacciones } = require("../models/transaccionModel");
 const { 
-  buscarIdWalletPorId, tieneBalanceDisponible, buscarWalletPorIdUsuario 
+  buscarIdWalletPorId, tieneBalanceDisponible, buscarWalletPorIdUsuario
 } = require("../models/walletModel");
 
 const realizarTransaccion = async (req, res) => {
@@ -338,4 +338,16 @@ const realizarVenta = async (req, res) => {
   }
 };
 
-module.exports = { realizarTransaccion, realizarCompra, realizarVenta };
+const consultarTransacciones = async (req, res) => {
+
+  try {
+    const transacciones = await buscarTransacciones()
+    res.status(201).json({ mensaje: "Consulta de Transacciones realizada con éxito", esValido: true, transacciones: transacciones });
+
+  } catch (error) {
+    console.error("Error consutarTransacciones:", error);
+    res.status(500).json({ mensaje: "Error interno al consultar las transacciones", esValido: false });
+  }
+};
+
+module.exports = { realizarTransaccion, realizarCompra, realizarVenta, consultarTransacciones };

@@ -70,7 +70,30 @@ async function actualizarEstadoTransaccion(id,transaccion) {
   }
 }
 
+async function buscarTransacciones() {
+  const pool = await poolPromise;
+  const result = await pool
+    .request()
+    .query(`
+      SELECT
+        T.Id, T.HashTx, T.Tipo, 
+        T.IdUsuarioOrigen, UO.Nombre NombreUsuarioOrigen, T.IdWalletOrigen, WO.Direccion DireccionWalletOrigen, WO.Balance BalanceActualWalletOrigen,
+        T.BalanceOrigenAntes, T.BalanceOrigenDespues,
+        T.IdUsuarioDestino, UD.Nombre NombreUsuarioDestino, T.IdWalletDestino, WD.Direccion DireccionWalletDestino, WD.Balance BalanceActualWalletDestino,
+        T.BalanceDestinoAntes, T.BalanceDestinoDespues,
+        T.Monto, T.Estado, T.Red, T.FechaCreacion
+      FROM Transaccion T
+      INNER JOIN Usuario UO ON T.IdUsuarioOrigen = UO.Id
+      INNER JOIN Usuario UD ON T.IdUsuarioDestino = UD.Id
+      INNER JOIN Wallet WO ON T.IdWalletOrigen = WO.Id AND T.IdUsuarioOrigen = WO.IdUsuario
+      INNER JOIN Wallet WD ON T.IdWalletDestino = WD.Id AND T.IdUsuarioDestino = WD.IdUsuario
+      ORDER BY T.ID 
+    `);
+  return result.recordset; // devuelve una lista de wallets o undefined
+}
+
 module.exports = {
   guardarTransaccion,
   actualizarEstadoTransaccion,
+  buscarTransacciones,
 }

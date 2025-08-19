@@ -175,7 +175,6 @@ const Wallet = (abrirForm) => {
       renderCell: ({row}) => {
         if (!row.FechaCreacion) return "";
         const date = new Date(row.FechaCreacion.replace("Z",""));
-        console.log(date);
         if (isNaN(date)) return "";
 
         return (

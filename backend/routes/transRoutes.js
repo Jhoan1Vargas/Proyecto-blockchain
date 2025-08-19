@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { realizarTransaccion, realizarCompra, realizarVenta } = require("../controllers/transaccionController");
+const { realizarTransaccion, realizarCompra, realizarVenta, consultarTransacciones } = require("../controllers/transaccionController");
 
-router.post("/", realizarTransaccion);
+router.get("/", consultarTransacciones);
+router.post("/transferencia", realizarTransaccion);
 router.post("/compra", realizarCompra);
 router.post("/venta", realizarVenta);
 
